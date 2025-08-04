@@ -206,7 +206,7 @@ app.post('/skills', async (req, res) => {
       });
     }
     
-    if (proficiency < 1 || proficiency > 10) {
+    if (proficiency < 1 || proficiency > 100) {
       return res.status(400).json({ 
         error: 'Proficiency must be between 1 and 10' 
       });
@@ -280,7 +280,7 @@ app.post('/skills/:id', async (req, res) => {
     // Validation
     if (proficiency !== undefined && (proficiency < 1 || proficiency > 10)) {
       return res.status(400).json({ 
-        error: 'Proficiency must be between 1 and 10' 
+        error: 'Proficiency must be between 1 and 100' 
       });
     }
     

@@ -72,7 +72,7 @@ All endpoints require the `X-API-Key` header with a valid API key.
 
 ### Health Check
 
-- **GET /health** - Health check (no auth required)
+- **GET /health** - Health check
 
 ## Database Schema
 
