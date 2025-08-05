@@ -79,8 +79,8 @@ const getOrCreateTags = async (client, tags) => {
   return tagIds;
 };
 
-// GET /skills - Get paginated skills with filtering
-app.get('/skills', async (req, res) => {
+// GET /paginated - Get paginated skills with filtering
+app.get('/paginated', async (req, res) => {
   try {
     const { page, pageSize, offset } = getPaginationParams(req);
     const { proficiency, years, tags } = req.query;
@@ -160,8 +160,8 @@ app.get('/skills', async (req, res) => {
   }
 });
 
-// GET /skills/:id - Get skill by ID
-app.get('/skills/:id', async (req, res) => {
+// GET /:id - Get skill by ID
+app.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -190,8 +190,8 @@ app.get('/skills/:id', async (req, res) => {
   }
 });
 
-// POST /skills - Create new skill
-app.post('/skills', async (req, res) => {
+// POST /create - Create new skill
+app.post('/create', async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -261,8 +261,8 @@ app.post('/skills', async (req, res) => {
   }
 });
 
-// POST /skills/:id - Update skill
-app.post('/skills/:id', async (req, res) => {
+// POST /update/:id - Update skill
+app.post('/update/:id', async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -348,8 +348,8 @@ app.post('/skills/:id', async (req, res) => {
   }
 });
 
-// POST /skills/:id/delete - Delete skill
-app.post('/skills/:id/delete', async (req, res) => {
+// POST /delete/:id - Delete skill
+app.post('/delete/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -366,8 +366,8 @@ app.post('/skills/:id/delete', async (req, res) => {
   }
 });
 
-// POST /admin/prune - Remove unused names and tags
-app.post('/admin/prune', async (req, res) => {
+// POST /prune - Remove unused names and tags
+app.post('/prune', async (req, res) => {
   const client = await pool.connect();
   
   try {
