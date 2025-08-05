@@ -79,8 +79,8 @@ const getOrCreateTags = async (client, tags) => {
   return tagIds;
 };
 
-// GET /paginated - Get paginated skills with filtering
-app.get('/paginated', async (req, res) => {
+// GET /get - Get paginated skills with filtering
+app.get('/get', async (req, res) => {
   try {
     const { page, pageSize, offset } = getPaginationParams(req);
     const { proficiency, years, tags } = req.query;
@@ -160,8 +160,8 @@ app.get('/paginated', async (req, res) => {
   }
 });
 
-// GET /:id - Get skill by ID
-app.get('/:id', async (req, res) => {
+// GET /get/:id - Get skill by ID
+app.get('/get/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -190,8 +190,8 @@ app.get('/:id', async (req, res) => {
   }
 });
 
-// POST /create - Create new skill
-app.post('/create', async (req, res) => {
+// POST /create-one - Create new skill
+app.post('/create-one', async (req, res) => {
   const client = await pool.connect();
   
   try {
