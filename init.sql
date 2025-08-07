@@ -17,7 +17,8 @@ CREATE TABLE skills (
   icon VARCHAR(255),
   image VARCHAR(255),
   description TEXT,
-  url VARCHAR(255)
+  url VARCHAR(255),
+  parent_id INTEGER REFERENCES skills(id) ON DELETE CASCADE
 );
 
 CREATE TABLE skill_tags (
@@ -25,3 +26,22 @@ CREATE TABLE skill_tags (
   tag_id INTEGER REFERENCES tags(id) ON DELETE RESTRICT,
   PRIMARY KEY (skill_id, tag_id)
 );
+
+-- Constraint to prevent multi-level nesting (subskills cannot have subskills)
+-- This is implemented as a trigger since CHECK constraints cannot reference other rows
+CREATE OR REPLACE FUNCTION check_no_nested_subskills()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.parent_id IS NOT NULL THEN
+    IF EXISTS (SELECT 1 FROM skills WHERE id = NEW.parent_id AND parent_id IS NOT NULL) THEN
+      RAISE EXCEPTION 'Subskills cannot have their own subskills (multi-level nesting not allowed)';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_no_nested_subskills
+  BEFORE INSERT OR UPDATE ON skills
+  FOR EACH ROW
+  EXECUTE FUNCTION check_no_nested_subskills();

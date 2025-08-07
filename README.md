@@ -1,78 +1,93 @@
-# SwordSkills API
+# SwordSkills - Skills Management Microservice with Subskills Support
 
-A Dockerized Express.js microservice for personal/professional skills management with PostgreSQL database.
+A Dockerized Express.js microservice for managing personal/professional skills with PostgreSQL, featuring nested subskills support, API key authentication, and secure public access.
 
 ## Features
 
-- **Secure API**: All endpoints require API key authentication via `X-API-Key` header
-- **CORS & Helmet**: Configured for secure public access
-- **PostgreSQL Database**: Normalized schema with skills, names, and tags
-- **Pagination**: All list endpoints support pagination
-- **Filtering**: Skills can be filtered by proficiency, years, and tags
-- **Docker Compose**: Easy deployment with PostgreSQL included
+- **RESTful API** with comprehensive CRUD operations
+- **Nested Subskills Support** - Single-level nesting with validation
+- **API Key Authentication** on all endpoints (X-API-Key header)
+- **Pagination** for all list endpoints
+- **Advanced Filtering** by proficiency, years, and tags
+- **PostgreSQL Database** with normalized schema
+- **Docker & Docker Compose** for easy deployment
+- **Security** with CORS and Helmet middleware
+- **Transaction Integrity** for all database operations
 
-## Quick Start
+## Database Schema
 
-1. **Clone and setup**:
-   ```bash
-   git clone <repository>
-   cd SwordSkills
-   ```
+### Core Tables
+- **`names`** - Unique skill/subskill names
+- **`tags`** - Reusable tags for categorization
+- **`skills`** - Main skills and subskills with parent-child relationships
+- **`skill_tags`** - Many-to-many relationship between skills and tags
 
-2. **Configure environment**:
-   - Copy `.env` and update `API_KEY` with a secure value
-   - Update database credentials if needed
-
-3. **Run with Docker Compose**:
-   ```bash
-   docker-compose up --build
-   ```
-
-4. **Test the API**:
-   ```bash
-   curl -H "X-API-Key: your-secure-api-key-here" http://localhost:3000/skills
-   ```
+### Subskills Architecture
+- Skills can have subskills (parent_id references skills.id)
+- Subskills cannot have their own subskills (single-level nesting only)
+- Database trigger prevents multi-level nesting
+- Cascade deletion ensures referential integrity
 
 ## API Endpoints
 
-All endpoints require the `X-API-Key` header with a valid API key.
+All endpoints require `X-API-Key` header authentication.
 
 ### Skills Management
 
-- **GET /skills** - Get paginated skills
-  - Query params: `page`, `pageSize`, `proficiency`, `years`, `tags`
-  - Example: `/skills?page=1&pageSize=5&proficiency=7&tags=Programming`
+#### `GET /skills`
+Get paginated skills (top-level only) with optional filtering
+- Query params: `page`, `pageSize`, `proficiency`, `years`, `tags`
+- Returns: Skills with subskills count and full subskills data
 
-- **GET /skills/:id** - Get skill by ID
+#### `GET /skills/:id`
+Get specific skill by ID with full subskills data
+- Returns: Complete skill object with subskills array
 
-- **POST /skills** - Create new skill
-  ```json
-  {
-    "name": "React",
-    "proficiency": 8,
-    "years": 3,
-    "description": "Frontend library for building UIs",
-    "tags": ["Programming", "Frontend"]
-  }
-  ```
+#### `POST /skills`
+Create new skill with optional subskills
+```json
+{
+  "name": "JavaScript",
+  "proficiency": 85,
+  "years": 5,
+  "description": "Modern JavaScript development",
+  "tags": ["Programming", "Web Development"],
+  "subskills": [
+    {
+      "name": "React",
+      "proficiency": 90,
+      "years": 3,
+      "description": "React.js library",
+      "tags": ["Frontend", "Library"]
+    }
+  ]
+}
+```
 
-- **POST /skills/:id** - Update skill (partial updates supported)
+#### `POST /skills/:id`
+Update skill and/or manage subskills
+- Include `subskills` array to replace all subskills
+- Existing subskills can be updated by including their `id`
+- New subskills created without `id`
+- Missing subskills are deleted
 
-- **POST /skills/:id/delete** - Delete skill
+#### `POST /skills/:id/delete`
+Delete skill and cascade delete all subskills
+- Returns: Deletion confirmation with subskills count
 
-### Data Management
+### Utility Endpoints
 
-- **GET /tags** - Get paginated tags
-  - Query params: `page`, `pageSize`
+#### `GET /tags`
+Get paginated list of all tags
 
-- **GET /names** - Get paginated skill names
-  - Query params: `page`, `pageSize`
+#### `GET /names`
+Get paginated list of all skill names
 
-- **POST /admin/prune** - Remove unused names and tags
+#### `POST /admin/prune`
+Remove unused names and tags from database
 
-### Health Check
-
-- **GET /health** - Health check
+#### `GET /health`
+Health check endpoint (no authentication required)
 
 ## Database Schema
 
